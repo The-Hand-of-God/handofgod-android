@@ -22,6 +22,8 @@ import com.tapwithus.sdk.mode.TapInputMode;
 import com.tapwithus.sdk.mouse.MousePacket;
 import com.tapwithus.sdk.tap.Tap;
 
+import java.io.IOException;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private int imuCounter;
     private int devCounter;
     private TextView textView;
-    private TextView valueView;
     private Button btnCalibrate;
     private int xMouse = 0, yMouse = 0, pMouse = 0, led0 = -1000, led1 = 0, led2 = 1000;
 
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         log("app started");
         textView = findViewById(R.id.textView);
-        valueView = findViewById(R.id.valueView);
+
         btnCalibrate = findViewById(R.id.calibrate);
 
         SharedPreferences sharedPrefAll = PreferenceManager.getDefaultSharedPreferences(this);
@@ -79,11 +80,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void setLEDs(boolean first, boolean second, boolean third) {
+        for (int i = 0; i < 3; i++) {
+            String onOrOff = "off";
+            if (i == 0) onOrOff = first ? "on" : "off";
+            else if (i == 1) onOrOff = second ? "on" : "off";
+            else if (i == 2) onOrOff = third ? "on" : "off";
+            String url = "http://192.168.5.164:5000/device/" + i + "/" + onOrOff;
+
+            final Request request = new Request.Builder().url(url).build();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        client.newCall(request).execute();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+    }
+
     public void calibrate(View view) {
         if (btnCalibrate.getText().equals("CALIBRATE")) {
             calibrating = true;
             textView.setText("Point at the left LED and then press the button:");
             btnCalibrate.setText("LEFT LED");
+
+            setLEDs(true, false, false);
             return;
         } else if (btnCalibrate.getText().equals("LEFT LED")) {
             xMouse = 0;
@@ -91,11 +117,15 @@ public class MainActivity extends AppCompatActivity {
             yMouse = 0;
             textView.setText("Point on the middle LED and then press the button:");
             btnCalibrate.setText("MIDDLE LED");
+
+            setLEDs(false, true, false);
             return;
         } else if (btnCalibrate.getText().equals("MIDDLE LED")) {
             led1 = xMouse;
             textView.setText("Point on the right LED and then press the button:");
             btnCalibrate.setText("RIGHT LED");
+
+            setLEDs(false, false, true);
             return;
         } else if (btnCalibrate.getText().equals("RIGHT LED")) {
             led2 = xMouse;
@@ -103,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
             btnCalibrate.setText("CALIBRATE");
             Toast.makeText(getBaseContext(), "Calibrated Successfully", Toast.LENGTH_SHORT).show();
             calibrating = false;
+
+            setLEDs(false, false, false);
 
             SharedPreferences sharedPrefAll = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editorAll = sharedPrefAll.edit();
@@ -351,7 +383,6 @@ public class MainActivity extends AppCompatActivity {
 
         log(message);
 
-        valueView.setText(message);
     }
 
 
