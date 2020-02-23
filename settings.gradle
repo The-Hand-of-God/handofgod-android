@@ -1,0 +1,2 @@
+include ':app', ':tap-android-sdk', ':tap-unity'
+rootProject.name='Tap'

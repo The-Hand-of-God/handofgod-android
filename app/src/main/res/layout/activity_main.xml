@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="30dp"
+        android:layout_marginBottom="5dp"
+        android:layout_above="@+id/calibrate"
+        android:id="@+id/textView"
+        android:text="Press the button to calibrate the location of the LEDs:" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:text="CALIBRATE"
+        android:textSize="50dp"
+        android:onClick="calibrate"
+        android:id="@+id/calibrate" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="30dp"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/calibrate"
+        android:id="@+id/valueView"
+        android:text="0" />
+
+
+</RelativeLayout>
